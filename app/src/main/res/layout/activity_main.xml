@@ -33,4 +33,47 @@
         android:layout_toEndOf="@+id/DistanceDescription"
         android:layout_marginLeft="24dp"
         android:layout_marginStart="24dp" />
+
+    <TextView
+        android:id="@+id/Latitudetextfield"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dip"
+        android:layout_marginRight="5dip"
+        android:text="Latitude: "
+        android:textSize="20dip" >
+    </TextView>
+
+    <TextView
+        android:id="@+id/TextView02"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unknown"
+        android:textSize="20dip"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/DistanceTextField"
+        android:layout_alignEnd="@+id/DistanceTextField">
+    </TextView>
+
+    <TextView
+        android:id="@+id/TextView04"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="unknown"
+        android:textSize="20dip"
+        android:layout_below="@+id/TextView02"
+        android:layout_alignRight="@+id/DistanceTextField"
+        android:layout_alignEnd="@+id/DistanceTextField">
+    </TextView>
+
+    <TextView
+        android:id="@+id/Longitude"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Longitute: "
+        android:textSize="20dip"
+        android:layout_below="@+id/Latitudetextfield"
+        android:layout_alignLeft="@+id/Latitudetextfield"
+        android:layout_alignStart="@+id/Latitudetextfield">
+    </TextView>
 </RelativeLayout>
