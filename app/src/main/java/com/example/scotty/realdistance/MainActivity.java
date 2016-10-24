@@ -41,21 +41,26 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.text.DecimalFormat;
 
 public class MainActivity extends AppCompatActivity implements LocationListener{
 
     public final static String EXTRA_DATA = "com.example.scotty.realdistance.AboutActivity";
     public static double RealDistance = 0.00;
+    private double tempDist;
     private String provider;
     private static final int MY_PERMISSION_ACCESS_FINE_LOCATION = 11;
     private LocationManager locationManager;
     AlarmManager alrm;
     private PendingIntent pi;
-
+    long timeinnanos;
+    double changetimeinhours;
     private TextView latituteField;
     private TextView longitudeField;
-    private double lon;
-    private double lati;
+    private double lon = 0;
+    private double lati = 0;
+    private Location location;
+    private int MPH;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,9 +69,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         latituteField = (TextView) findViewById(R.id.TextView02);
         longitudeField = (TextView) findViewById(R.id.TextView04);
-
-
-
 
         // Get the location manager
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -79,8 +81,8 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
         Criteria criteria = new Criteria();
         provider = locationManager.getBestProvider(criteria, false);
-        Location location = locationManager.getLastKnownLocation(provider);
-
+        location = locationManager.getLastKnownLocation(provider);
+        timeinnanos = location.getElapsedRealtimeNanos();
         // Initialize the location fields
         if (location != null) {
             System.out.println("Provider " + provider + " has been selected.");
@@ -125,17 +127,24 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         Location.distanceBetween(
                 lon,lati,
                 lng, lat, results);
+        // placeholder until persistent storage
         if (RealDistance > 1000){
-            System.out.println("heooo" );
             RealDistance = 0;
         }
-        RealDistance = RealDistance + results[0];
-        System.out.println(results[0] );
-        System.out.println(RealDistance );
-        latituteField.setText(String.valueOf(lat));
-        longitudeField.setText(String.valueOf(lng));
-        lon = lng;
-        lati = lat;
+        changetimeinhours = (location.getElapsedRealtimeNanos() - timeinnanos) * (0.000277777777778/1000000000);
+        timeinnanos = location.getElapsedRealtimeNanos();
+        tempDist = results[0];
+        // convert to miles
+        tempDist *= 0.000621371;
+        System.out.println(tempDist/changetimeinhours);
+        // milomiter  more than 1 MPH, and less than 15 to avoid car travel
+        if (((tempDist/changetimeinhours) > 1 && (tempDist/changetimeinhours) < 15)|| lon == 0 || lati == 0) {
+            RealDistance = RealDistance + tempDist;
+            lon = lng;
+            lati = lat;
+        }
+        latituteField.setText(truncateDecimalstoString(lat, 2));
+        longitudeField.setText(truncateDecimalstoString(lng, 2));
         updateDistanceTextField();
     }
 
@@ -159,7 +168,14 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     private void updateDistanceTextField() {
         TextView t = (TextView)findViewById(R.id.DistanceTextField);
-        t.setText(String.valueOf(RealDistance));
+        t.setText(truncateDecimalstoString(RealDistance, 3));
+    }
+
+    private String truncateDecimalstoString(double oldnumber, int decilength){
+        DecimalFormat ProperDisplay = new DecimalFormat();
+        ProperDisplay.setMaximumFractionDigits(decilength);
+        ProperDisplay.setMinimumFractionDigits(0);
+        return (ProperDisplay.format(oldnumber));
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
