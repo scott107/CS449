@@ -186,16 +186,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         if (RealDistance != 100 && RealDistance > 0){
             DatabaseModel model = DatabaseModel.instance(this);
             model.insertDaily(RealDistance);
-
+/*
             TextView y = (TextView) findViewById(R.id.YesterdayTextField);
             try {
                 double yester = model.YesterdayDaily();
                 y.setText(truncateDecimalstoString(yester, 3));
             }
             catch( Exception e ){
-                y.setText(e.getMessage());
+                y.setText(truncateDecimalstoString(RealDistance, 3));
             }
-
+*/
         }
     }
 

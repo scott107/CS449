@@ -54,7 +54,7 @@ public class Daily {
     //      in the event that yesterday's daily total is not in the database.
     public double Yesterday() throws Exception{
         c = Calendar.getInstance();
-        String YesterdaysDate = (Integer.toString(c.DAY_OF_MONTH-1) + '/' + Integer.toString(c.MONTH) + '/' + Integer.toString(c.YEAR));
+        String YesterdaysDate = (Integer.toString(c.DAY_OF_MONTH) + '/' + Integer.toString(c.MONTH) + '/' + Integer.toString(c.YEAR));
 
         String dist = "";
 
@@ -65,13 +65,13 @@ public class Daily {
                 DatabaseHelper.FIELD_DISTANCE};
         Cursor cursor = db.query(DatabaseHelper.DAILY_TABLE,
                 from,
-                DatabaseHelper.FIELD_DATE + "=" + YesterdaysDate,
+                DatabaseHelper.FIELD_DATE + "=" + date,
                 null,
                 null,
                 null,
                 null);
 
-        while (cursor.moveToNext()) {
+        if (cursor.moveToNext()) {
             long id = cursor.getLong(0);
             dist = cursor.getString(2);
 
