@@ -43,6 +43,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 import java.text.DecimalFormat;
 
+import static com.example.scotty.realdistance.R.id.YesterdayTextField;
+
 public class MainActivity extends AppCompatActivity implements LocationListener{
 
     public final static String EXTRA_DATA = "com.example.scotty.realdistance.AboutActivity";
@@ -61,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private double lati = 0;
     private Location location;
     private int MPH;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,6 +99,18 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         lon = (double) (location.getLongitude());
 
         updateDistanceTextField();
+
+        DatabaseModel model = DatabaseModel.instance(getApplicationContext());
+        model = DatabaseModel.instance(this);
+        TextView y = (TextView) findViewById(R.id.YesterdayTextField);
+        try {
+            double yester = model.YesterdayDaily();
+            y.setText(truncateDecimalstoString(yester, 3));
+        }
+        catch( Exception e ){
+            y.setText(e.getMessage());
+        }
+
     }
 
     /* Request updates at startup */
@@ -136,7 +151,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         tempDist = results[0];
         // convert to miles
         tempDist *= 0.000621371;
-        System.out.println(tempDist/changetimeinhours);
         // milomiter  more than 1 MPH, and less than 15 to avoid car travel
         if (((tempDist/changetimeinhours) > 1 && (tempDist/changetimeinhours) < 15)|| lon == 0 || lati == 0) {
             RealDistance = RealDistance + tempDist;
@@ -169,6 +183,20 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private void updateDistanceTextField() {
         TextView t = (TextView)findViewById(R.id.DistanceTextField);
         t.setText(truncateDecimalstoString(RealDistance, 3));
+        if (RealDistance != 100 && RealDistance > 0){
+            DatabaseModel model = DatabaseModel.instance(this);
+            model.insertDaily(RealDistance);
+
+            TextView y = (TextView) findViewById(R.id.YesterdayTextField);
+            try {
+                double yester = model.YesterdayDaily();
+                y.setText(truncateDecimalstoString(yester, 3));
+            }
+            catch( Exception e ){
+                y.setText(e.getMessage());
+            }
+
+        }
     }
 
     private String truncateDecimalstoString(double oldnumber, int decilength){

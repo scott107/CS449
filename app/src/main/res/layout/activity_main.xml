@@ -76,4 +76,23 @@
         android:layout_alignLeft="@+id/Latitudetextfield"
         android:layout_alignStart="@+id/Latitudetextfield">
     </TextView>
+
+    <TextView
+        android:text="Yesterday's Distance:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="117dp"
+        android:id="@+id/textView"
+        android:layout_below="@+id/DistanceDescription"
+        android:layout_alignStart="@+id/Longitude"
+        android:layout_toStartOf="@+id/DistanceTextField" />
+
+    <TextView
+        android:text=""
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textView"
+        android:layout_toEndOf="@+id/DistanceTextField"
+        android:layout_marginStart="14dp"
+        android:id="@+id/YesterdayTextField" />
 </RelativeLayout>
