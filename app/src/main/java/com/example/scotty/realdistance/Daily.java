@@ -8,8 +8,12 @@ import android.util.Log;
 
 import junit.framework.Assert;
 
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+
+import static java.util.Calendar.DATE;
 
 /**
  * Created by scotty on 11/6/2016.
@@ -32,7 +36,8 @@ public class Daily {
         ContentValues values = new ContentValues();
 
         c = Calendar.getInstance();
-
+        //String date = DateFormat.getDateInstance().format(new Date());
+        //String currentDateTimeString = DateFormat.getDateTimeInstance().format(new Date());
         date = (Integer.toString(c.DAY_OF_MONTH) + '/' + Integer.toString(c.MONTH) + '/' + Integer.toString(c.YEAR));
 
         values.put(DatabaseHelper.FIELD_DATE, date);
@@ -54,7 +59,11 @@ public class Daily {
     //      in the event that yesterday's daily total is not in the database.
     public double Yesterday() throws Exception{
         c = Calendar.getInstance();
+        //String today = DateFormat.getDateInstance().format(new Date());
+        //PreviousDay previous = new PreviousDay();
+        //String YesterdaysDate = previous.giveMeThePreviousDay(today);
         String YesterdaysDate = (Integer.toString(c.DAY_OF_MONTH) + '/' + Integer.toString(c.MONTH) + '/' + Integer.toString(c.YEAR));
+
 
         String dist = "";
 

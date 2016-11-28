@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         DatabaseModel model = DatabaseModel.instance(getApplicationContext());
         model = DatabaseModel.instance(this);
         TextView y = (TextView) findViewById(R.id.YesterdayTextField);
+
         try {
             double yester = model.YesterdayDaily();
             y.setText(truncateDecimalstoString(yester, 3));
@@ -136,6 +137,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
 
     @Override
     public void onLocationChanged(Location location) {
+
         double lat = (double) (location.getLatitude());
         double lng = (double) (location.getLongitude());
         float[] results = new float[1];
@@ -160,6 +162,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         latituteField.setText(truncateDecimalstoString(lat, 2));
         longitudeField.setText(truncateDecimalstoString(lng, 2));
         updateDistanceTextField();
+
     }
 
     @Override

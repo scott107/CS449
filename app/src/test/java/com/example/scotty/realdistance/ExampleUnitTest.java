@@ -11,7 +11,20 @@ import static org.junit.Assert.*;
  */
 public class ExampleUnitTest {
     @Test
-    public void addition_isCorrect() throws Exception {
-        assertEquals(4, 2 + 2);
+    public void previousDayWorks() throws Exception {
+        String date = "Nov 27, 2016";
+        PreviousDay prev = new PreviousDay();
+        String yesterday = prev.giveMeThePreviousDay(date);
+
+        assertEquals(yesterday, "Nov 26, 2016");
     }
+    @Test
+    public void previousMonthOrYearWorks() throws Exception {
+        String date = "Nov 1, 2016";
+        PreviousDay prev = new PreviousDay();
+        String yesterday = prev.giveMeThePreviousDay(date);
+
+        assertEquals(yesterday, "Oct 31, 2016");
+    }
+
 }
