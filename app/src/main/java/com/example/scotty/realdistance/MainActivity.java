@@ -1,5 +1,6 @@
 package com.example.scotty.realdistance;
 
+import android.*;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -12,6 +13,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -60,9 +62,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private TextView latituteField;
     private TextView longitudeField;
     private double lon = 0;
-    private double lati = 0;
+    private double previousLatitude= 0;
     private Location location;
     private int MPH;
+    private String bestProvider;
+    private static final int MinDistance = 0;
+    private static final int MaxDistance = 1000;
+    private static final double MetersToMiles = 0.000621371;
+
+    private static final int MY_PERMISSIONS_REQUEST_FINE_LOCATION = 123;
+    private static final int MY_PERMISSIONS_REGISTER_FOR_UPDATES = MY_PERMISSIONS_REQUEST_FINE_LOCATION + 1;
 
 
     @Override
@@ -78,8 +87,16 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         // Define the criteria how to select the locatioin provider -> use
         // default
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_COARSE_LOCATION}, MY_PERMISSION_ACCESS_FINE_LOCATION);
+        if (ContextCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this,
+                    new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+                    MY_PERMISSIONS_REGISTER_FOR_UPDATES);
+        }
+        else {
+            // Register for updates
+            registerForUpdates();
         }
 
         Criteria criteria = new Criteria();
@@ -95,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             longitudeField.setText("Location not available");
         }
 
-        lati = (double) (location.getLatitude());
+        previousLatitude = (double) (location.getLatitude());
         lon = (double) (location.getLongitude());
 
         updateDistanceTextField();
@@ -111,7 +128,7 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         catch( Exception e ){
             y.setText(e.getMessage());
         }
-
+        MyService alarm = new MyService();
     }
 
     /* Request updates at startup */
@@ -142,22 +159,22 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
         double lng = (double) (location.getLongitude());
         float[] results = new float[1];
         Location.distanceBetween(
-                lon,lati,
+                lon,previousLatitude,
                 lng, lat, results);
         // placeholder until persistent storage
-        if (RealDistance > 1000){
+        if (RealDistance > MaxDistance){
             RealDistance = 0;
         }
         changetimeinhours = (location.getElapsedRealtimeNanos() - timeinnanos) * (0.000277777777778/1000000000);
         timeinnanos = location.getElapsedRealtimeNanos();
         tempDist = results[0];
         // convert to miles
-        tempDist *= 0.000621371;
+        tempDist *= MetersToMiles;
         // milomiter  more than 1 MPH, and less than 15 to avoid car travel
-        if (((tempDist/changetimeinhours) > 1 && (tempDist/changetimeinhours) < 15)|| lon == 0 || lati == 0) {
+        if (((tempDist/changetimeinhours) > 1 && (tempDist/changetimeinhours) < 15)|| lon == 0 || previousLatitude== 0) {
             RealDistance = RealDistance + tempDist;
             lon = lng;
-            lati = lat;
+            previousLatitude = lat;
         }
         latituteField.setText(truncateDecimalstoString(lat, 2));
         longitudeField.setText(truncateDecimalstoString(lng, 2));
@@ -186,10 +203,10 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
     private void updateDistanceTextField() {
         TextView t = (TextView)findViewById(R.id.DistanceTextField);
         t.setText(truncateDecimalstoString(RealDistance, 3));
-        if (RealDistance != 100 && RealDistance > 0){
+        if (RealDistance > MinDistance){
             DatabaseModel model = DatabaseModel.instance(this);
             model.insertDaily(RealDistance);
-/*
+
             TextView y = (TextView) findViewById(R.id.YesterdayTextField);
             try {
                 double yester = model.YesterdayDaily();
@@ -198,7 +215,6 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
             catch( Exception e ){
                 y.setText(truncateDecimalstoString(RealDistance, 3));
             }
-*/
         }
     }
 
@@ -232,6 +248,39 @@ public class MainActivity extends AppCompatActivity implements LocationListener{
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+    private void registerForUpdates() {
+        try {
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            bestProvider = locationManager.getBestProvider(criteria, false);
+            locationManager.requestLocationUpdates(bestProvider, 20000, 1, this);
+        } catch (SecurityException e) {
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REGISTER_FOR_UPDATES:
+                // Register for updates
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    registerForUpdates();
+                }
+                else {
+                    Toast.makeText(getApplicationContext(),
+                            "Can't register for updates at this time.", Toast.LENGTH_LONG).show();
+                }
+                break;
+
+            case MY_PERMISSIONS_REQUEST_FINE_LOCATION:
+                break;
+
+            default:
+                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 

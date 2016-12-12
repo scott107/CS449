@@ -33,7 +33,7 @@ public class DatabaseModel {
     //throws exception
     //      in the event that yesterday's daily total is not in the database.
     public double YesterdayDaily() throws Exception{
-        return dailyGateway.Yesterday();
+        return dailyGateway.YesterdaysDistance();
     }
 
     public long insertWorkout(Integer Workout) {

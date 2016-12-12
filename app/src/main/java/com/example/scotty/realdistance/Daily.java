@@ -33,6 +33,13 @@ public class Daily {
         DatabaseHelper dbHelper = new DatabaseHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+        // Assert warning if todays's distance is not positive.  log and return zero
+        if (AssertSettings.PRIORITY2_ASSERTIONS) {
+
+            Assert.assertTrue(Daily > 0.0);
+            return 0;
+        }
+
         ContentValues values = new ContentValues();
 
         c = Calendar.getInstance();
@@ -57,7 +64,7 @@ public class Daily {
 
     //throws exception
     //      in the event that yesterday's daily total is not in the database.
-    public double Yesterday() throws Exception{
+    public double YesterdaysDistance() throws Exception{
         c = Calendar.getInstance();
         //String today = DateFormat.getDateInstance().format(new Date());
         //PreviousDay previous = new PreviousDay();

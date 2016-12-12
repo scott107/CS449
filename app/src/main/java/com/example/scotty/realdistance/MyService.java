@@ -15,7 +15,7 @@ import android.util.Log;
 
 public class MyService extends Service
 {
-    private static final String TAG = "BOOMBOOMTESTGPS";
+    private static final String TAG = "TESTGPS";
     private LocationManager mLocationManager = null;
     private static final int LOCATION_INTERVAL = 1000;
     private static final float LOCATION_DISTANCE = 10f;
